@@ -1,12 +1,13 @@
 import csv
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-import reverse_geocoder as rg
+
 import pycountry
-import time
+import reverse_geocoder as rg
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
 if len(sys.argv) > 1:
     file = sys.argv[1]
@@ -60,19 +61,36 @@ for el in data:
     pca_date = time.mktime(datetime.strptime(el[header.index('acq_date')], "%Y-%m-%d").timetuple())
     data_for_pca.append(
         [float(el[header.index('latitude')]), float(el[header.index('longitude')]),
-         float(el[header.index('brightness')]),float(el[header.index('scan')]), float(el[header.index('track')]),
+         float(el[header.index('brightness')]), float(el[header.index('scan')]), float(el[header.index('track')]),
          pca_time, pca_date, float(el[header.index('bright_t31')]), float(el[header.index('frp')])])
 scaled_data_for_pca = StandardScaler().fit_transform(data_for_pca)
 pca = PCA(n_components=2)
 principalComponents = pca.fit_transform(scaled_data_for_pca)
+max_x, max_y, min_x, min_y = None, None, None, None
+first_iteration = True
+for component in principalComponents:
+    if first_iteration:
+        min_x = component[0]
+        min_y = component[1]
+        first_iteration = False
+    else:
+        if component[0] < min_x:
+            min_x = component[0]
+        if component[1] < min_y:
+            min_y = component[1]
+
+for component in principalComponents:
+    component[0] = component[0] + abs(min_x)
+    component[1] = component[1] + abs(min_y)
+    print(component)
 """
 from matplotlib import pyplot as plt
 plt.plot(principalComponents[:, 0], principalComponents[:, 1], 'o', markersize=3, color='blue', alpha=0.5,
          label='PCA transformed data in the new 2D space')
 plt.xlabel('Y1')
 plt.ylabel('Y2')
-plt.xlim([-10, 20])
-plt.ylim([-5, 20])
+plt.xlim([0, 20])
+plt.ylim([0, 20])
 plt.legend()
 plt.title('Transformed data from sklearn.decomposition import PCA')
 plt.show()
@@ -83,7 +101,7 @@ with open(out_file, 'w', newline='') as csvfile:
     index = 0
     for el in data:
         if index == 0:
-            header.extend(["PCA component1", "PCA component2"])
+            header.extend(["PCA_component1", "PCA_component2"])
             writer.writerow(header)
         el.extend(principalComponents[index])
         writer.writerow(el)
