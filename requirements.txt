@@ -1,0 +1,5 @@
+matplotlib
+pycountry
+requests
+scikit-learn
+urllib3
