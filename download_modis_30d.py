@@ -10,7 +10,6 @@ if len(sys.argv) < 3:
 else:
     app_key = sys.argv[1]
     folder = sys.argv[2]
-
 os.system(
     'wget -e robots=off -m -np -R .html,.tmp -nH --cut-dirs=7 "https://nrt4.modaps.eosdis.nasa.gov/api/v2/content/archives/FIRMS/c6/Europe" '
     '--header "Authorization: Bearer ' + app_key + '" -P ' + folder)
@@ -24,7 +23,6 @@ for path, subdirs, files in os.walk(folder):
 line_written = 0
 if len(files_name) == 0:
     exit(-1)
-print(str(Path(files_name[0]).parent) + "/merged.csv")
 with open(str(Path(files_name[0]).parent) + "/merged.csv", mode='w') as csvfile:
     writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
     for file_name in files_name:
@@ -36,6 +34,8 @@ with open(str(Path(files_name[0]).parent) + "/merged.csv", mode='w') as csvfile:
                     writer.writerow(row)
                     line_count += 1
                     line_written += 1
+                elif line_count == 0:
+                    line_count += 1
                 else:
                     writer.writerow(row)
                     line_count += 1
