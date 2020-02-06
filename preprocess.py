@@ -62,7 +62,10 @@ data_for_pca = []
 for el in data:
     acquire_time = el[header.index('acq_time')]
     pca_time = int(acquire_time[0:2]) * 60
-    pca_time = pca_time + int(acquire_time[3:])
+    if ":" in acquire_time:
+        pca_time = pca_time + int(acquire_time[3:])
+    else:
+        pca_time = pca_time + int(acquire_time[2:])
     pca_date = time.mktime(datetime.strptime(el[header.index('acq_date')], "%Y-%m-%d").timetuple())
     data_for_pca.append(
         [float(el[header.index('latitude')]), float(el[header.index('longitude')]),
