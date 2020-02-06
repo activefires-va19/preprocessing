@@ -39,6 +39,7 @@ for el in data:
     coordinates.append((el[0], el[1]))
 results = rg.search(coordinates)
 countries = []
+area = []
 for el in results:
     try:
         countries.append(pycountry.countries.get(alpha_2=el['cc']).name.replace(",", ""))
@@ -47,17 +48,21 @@ for el in results:
             countries.append('Kosovo')
         else:
             countries.append(el['cc'])
+for el in data:
+    area.append(float(el[header.index('track')]) * float(el[header.index('scan')]))
 index = 0
 for el in data:
     el.insert(0, countries[index])
+    el.append(area[index])
     index += 1
 
-header.insert(0, 'Country')
+header.insert(0, 'country')
+header.append('area')
 data_for_pca = []
 for el in data:
     acquire_time = el[header.index('acq_time')]
     pca_time = int(acquire_time[0:2]) * 60
-    pca_time = pca_time + int(acquire_time[2:])
+    pca_time = pca_time + int(acquire_time[3:])
     pca_date = time.mktime(datetime.strptime(el[header.index('acq_date')], "%Y-%m-%d").timetuple())
     data_for_pca.append(
         [float(el[header.index('latitude')]), float(el[header.index('longitude')]),
