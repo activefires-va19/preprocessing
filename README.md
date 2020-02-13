@@ -1,4 +1,4 @@
-# Active Fire Monitoring - Preprocessing
+# Active Fires Monitoring - Preprocessing
 
 This project was made for the exam of course "Visual Analytics" for the Sapienza's master degree "Engineering in Computer Science".
 
